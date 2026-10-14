@@ -3,8 +3,7 @@
 A self-hosted alternative to website blockers like [Freedom](https://freedom.to), built on NextDNS and Tailscale.
 
 Distracting sites sit in named **lists** (for example *Video*: YouTube; *Social*: Twitter and X). Each list has its
-own weekly hours, and outside those hours the sites are blocked on every device you own, at the DNS level. A few
-categories (porn, gambling) are blocked at all hours. A small web page and a CLI, running on one always-on machine
+own weekly hours, and outside those hours the sites are blocked on every device you own, at the DNS level. Low quality websites of various types are automatically banned at all times. A small web page and a CLI, running on one always-on machine
 at home, let you take a short **pass**, **block now**, and edit the lists and hours.
 
 The design rule is that **friction is the product**. There is no off switch. A pass (15 minutes, 3 a day by default)
@@ -12,7 +11,7 @@ is the only way to open things early. Any edit that would loosen the rules durin
 list's unlock rather than applied, so you can't buy your way out in a weak moment.
 
 > Status: personal software that runs every day for one household. It is shared so others can fork it and build
-> their own version, not as a polished product. Python 3 standard library only, 128 tests, no network in tests.
+> their own version, not as a polished product.
 
 ---
 
