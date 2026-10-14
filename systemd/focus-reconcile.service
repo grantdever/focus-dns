@@ -1,0 +1,12 @@
+[Unit]
+Description=focus: make NextDNS match the hours, passes and lists
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPO@
+ExecStart=/usr/bin/python3 -m focus reconcile
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/focus -%h/.config/systemd/user/focus-flip.timer.d

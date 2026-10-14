@@ -1,0 +1,12 @@
+[Unit]
+Description=focus: weekly report (lookups vs the 300,000 cap, passes taken)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPO@
+ExecStart=/usr/bin/python3 -m focus report --save
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/focus

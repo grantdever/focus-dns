@@ -1,0 +1,31 @@
+{
+ "_source": "GET /profiles/{id} data, trimmed; profile as configured 2026-10-13 evening, categories included (docs/api-notes.md)",
+ "name": "Focus",
+ "parentalControl": {
+  "safeSearch": false,
+  "youtubeRestrictedMode": false,
+  "blockBypass": true,
+  "services": [
+   {"id": "youtube", "website": "https://www.youtube.com", "recreation": true, "active": true},
+   {"id": "twitter", "website": "https://twitter.com", "recreation": true, "active": true}
+  ],
+  "categories": [
+   {"id": "porn", "recreation": false, "active": true},
+   {"id": "gambling", "recreation": false, "active": true}
+  ],
+  "recreation": {
+   "times": {
+    "monday": {"start": "17:00:00", "end": "23:59:00"},
+    "tuesday": {"start": "17:00:00", "end": "23:59:00"},
+    "wednesday": {"start": "17:00:00", "end": "23:59:00"},
+    "thursday": {"start": "17:00:00", "end": "23:59:00"},
+    "friday": {"start": "17:00:00", "end": "23:59:00"},
+    "saturday": {"start": "00:00:00", "end": "23:59:00"},
+    "sunday": {"start": "00:00:00", "end": "23:59:00"}
+   },
+   "timezone": "America/New_York"
+  }
+ },
+ "denylist": [{"id": "x.com", "active": true}],
+ "_analytics_status": [{"status": "blocked", "queries": 7}, {"status": "default", "queries": 1}]
+}

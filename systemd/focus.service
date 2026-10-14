@@ -1,0 +1,19 @@
+[Unit]
+Description=focus: the blocking page on 127.0.0.1:4861 and the tailnet address (FOCUS_TAILNET_IP):4861
+After=default.target network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=@REPO@
+ExecStart=/usr/bin/python3 -m focus serve
+Restart=always
+RestartSec=5
+# Read-only everywhere except the state folder and the generated flip-timer schedule.
+# Network is not restricted: it calls api.nextdns.io and serves on two addresses.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/focus -%h/.config/systemd/user/focus-flip.timer.d
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Install and enable focus: the page, the 5-minute reconcile, the schedule flips, the weekly report.
+# Safe to re-run: it refreshes the unit files and keeps the existing token and state.
+set -euo pipefail
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+U="$HOME/.config/systemd/user"
+STATE="$HOME/.local/state/focus"
+CONF="$HOME/.config/focus"
+
+mkdir -p "$U/focus-flip.timer.d" "$STATE" "$CONF" "$HOME/.local/bin"
+chmod 700 "$STATE"
+
+if [[ ! -s "$CONF/token" ]]; then
+  (umask 077; python3 -c 'import secrets; print(secrets.token_urlsafe(32))' > "$CONF/token")
+  echo "Generated the phone login token in $CONF/token."
+fi
+[[ -f "$CONF/nextdns.env" ]] || { echo "Missing $CONF/nextdns.env: copy config/nextdns.env.example there and fill it in." >&2; exit 1; }
+chmod 600 "$CONF/nextdns.env"
+if ! grep -q '^FOCUS_TAILNET_IP=.' "$CONF/nextdns.env"; then
+  TIP="$(tailscale ip -4 2>/dev/null | head -1 || true)"
+  [[ -n "$TIP" ]] || { echo "Set FOCUS_TAILNET_IP in $CONF/nextdns.env (this machine's Tailscale IPv4; 'tailscale ip -4')." >&2; exit 1; }
+  echo "FOCUS_TAILNET_IP=$TIP" >> "$CONF/nextdns.env"
+  echo "Recorded this machine's tailnet address ($TIP) in $CONF/nextdns.env."
+fi
+
+for f in focus.service focus-reconcile.service focus-reconcile.timer focus-flip.timer focus-report.service focus-report.timer focus-usage.service focus-usage.timer; do
+  sed "s|@REPO@|$REPO|g" "$REPO/systemd/$f" > "$U/$f"
+done
+ln -sf "$REPO/bin/focus" "$HOME/.local/bin/focus"
+
+cd "$REPO"
+python3 -m focus timers --write
+systemctl --user daemon-reload
+systemctl --user enable --now focus.service focus-reconcile.timer focus-flip.timer focus-report.timer focus-usage.timer
+systemctl --user restart focus.service
+echo
+systemctl --user --no-pager list-timers 'focus-*'
+echo
+echo "Page: http://127.0.0.1:4861/  (phone: run 'focus link' for the one-time login link)"
+echo "Check: focus doctor"

@@ -1,0 +1,14 @@
+# Credentials and runtime state never live in the repo.
+.env
+*.env
+.env.*
+state/
+*.state.json
+state.json
+token
+__pycache__/
+*.pyc
+!config/*.env.example
+usage.sqlite
+*.sqlite
+reports/

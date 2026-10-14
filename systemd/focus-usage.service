@@ -1,0 +1,12 @@
+[Unit]
+Description=focus: pull the last few minutes of NextDNS lookups into the local usage file
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPO@
+ExecStart=/usr/bin/python3 -m focus usage collect
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/focus

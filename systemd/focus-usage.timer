@@ -1,0 +1,12 @@
+[Unit]
+Description=focus: collect usage every 5 minutes (NextDNS keeps logs for an hour)
+
+[Timer]
+OnBootSec=2min
+OnCalendar=*:2/5
+AccuracySec=10s
+Persistent=true
+Unit=focus-usage.service
+
+[Install]
+WantedBy=timers.target

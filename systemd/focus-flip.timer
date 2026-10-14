@@ -1,0 +1,14 @@
+[Unit]
+Description=focus: reconcile at each schedule edge (denylist domains ignore NextDNS Recreation Time)
+
+# The real OnCalendar= lines come from the hours table: focus-flip.timer.d/schedule.conf,
+# written by `focus timers --write` and rewritten whenever the hours change. It replaces these defaults.
+[Timer]
+OnCalendar=*-*-* 00:00:00 America/New_York
+OnCalendar=Mon..Fri *-*-* 17:00:00 America/New_York
+AccuracySec=1s
+Persistent=true
+Unit=focus-reconcile.service
+
+[Install]
+WantedBy=timers.target
