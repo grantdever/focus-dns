@@ -94,6 +94,66 @@ between phone and terminal.
 | [docs/build-your-own.md](docs/build-your-own.md) | Forking and changing it, with or without an AI coding assistant; ideas for variants |
 | [CLAUDE.md](CLAUDE.md) | Rules for an AI coding agent working in this repo (the invariants that must not break) |
 
+## Staying on the free NextDNS plan
+
+NextDNS's free plan covers 300,000 lookups a month, and it fills faster than you'd guess. A phone, a laptop and
+a desktop can each make 10,000 or more lookups a day, and most of them aren't you browsing. They're background
+chatter: OS updates and telemetry, browser services, password-manager sync, game launchers, chat apps, and
+certificate checks. Blocked trackers count too, and apps often retry them over and over. Past the cap, NextDNS
+keeps answering lookups but **quits filtering for the rest of the month**, without telling you, so every block
+opens up.
+
+If your devices resolve through Tailscale (step 3 of [setup](docs/setup.md): NextDNS as the tailnet's global
+nameserver with *Override DNS servers* on), you can send known-harmless domains to a plain public resolver with
+Tailscale's **split DNS**. Everything else still goes to NextDNS. Those lookups then don't count against the
+quota, and the blocking is unchanged. The other option is NextDNS Pro (about $20 a year, unlimited lookups),
+which is simpler if the numbers don't come down far enough.
+
+**1. Find the noise.** In NextDNS, open *Analytics → Domains* and filter by device, or read the logs for an
+hour or a day. Look for the registrable domains (`example.com`, not `cdn3.eu.example.com`) that make the most
+lookups and that you'd never want blocked.
+
+**2. Choose carefully.** Anything routed around NextDNS is no longer filtered or logged there, and ad and
+tracker blocking for it goes away too. A domain is safe to route only if:
+
+- it doesn't serve anything you block. Watch for apps that live under a big provider's shared domain: a blocked
+  site's mobile app often talks to an API host under its parent company's general API domain. Route only what
+  you've checked;
+- it isn't a general CDN or cloud host (the shared networks that serve millions of sites). Those can serve
+  anything, including the categories you block;
+- it doesn't contain a bypass. Some large domains include a public DNS-over-HTTPS server or a privacy relay
+  that NextDNS's *Block Bypass Methods* blocks today. Check the likely names with the resolver test below. If
+  one is blocked, either leave the whole domain on NextDNS, or add a second, more specific route that sends
+  just that name back to NextDNS. Tailscale uses the longest matching route, so the specific one wins.
+
+**3. Add the routes.** In the Tailscale admin console, go to **DNS → Nameservers → Add nameserver → Custom**,
+enter a plain resolver (for example `1.1.1.1`), turn on **Restrict to domain**, and enter the domain. Repeat
+for each domain. For a carve-out, add a route for that exact name that points at your NextDNS address (the
+one shown under *Global nameservers*). With many domains, one call to the Tailscale API is quicker:
+
+```
+PATCH https://api.tailscale.com/api/v2/tailnet/-/dns/split-dns
+{"example.com": ["1.1.1.1", "1.0.0.1"], "doh.example.com": ["<your NextDNS address>"]}
+```
+
+Use an access token with a short expiry, and revoke it when you're done. A setting to `null` deletes that route.
+*Block Bypass Methods* blocks `api.tailscale.com` itself. The admin console still works, or you can allowlist
+that one name in NextDNS while you make the change and take it off the allowlist afterwards.
+
+**4. Check it.** Blocked sites must still answer `0.0.0.0`. `focus doctor` tests every target. You can also test
+any name against the profile directly:
+
+```
+curl -s -H 'accept: application/dns-json' 'https://dns.nextdns.io/<profile-id>?name=<name>&type=A'
+```
+
+On a device with Tailscale on, the routed names should resolve normally, and they should drop out of NextDNS's
+logs within a few minutes. Compare the next full day's count with the day before.
+
+What it doesn't cover: a device with Tailscale off sends everything to NextDNS through its own profile, so those
+lookups still count, and nothing is less safe. A server or build machine that doesn't need filtering at all can
+use a plain resolver for everything.
+
 ## Limits, honestly
 
 DNS blocking is a speed bump, not a wall. Someone determined can get around it with a VPN, another device, a
