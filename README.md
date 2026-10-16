@@ -136,7 +136,7 @@ PATCH https://api.tailscale.com/api/v2/tailnet/-/dns/split-dns
 {"example.com": ["1.1.1.1", "1.0.0.1"], "doh.example.com": ["<your NextDNS address>"]}
 ```
 
-Use an access token with a short expiry, and revoke it when you're done. A setting to `null` deletes that route.
+Use an access token with a short expiry, and revoke it when you're done. Setting a domain to `null` in that call deletes its route.
 *Block Bypass Methods* blocks `api.tailscale.com` itself. The admin console still works, or you can allowlist
 that one name in NextDNS while you make the change and take it off the allowlist afterwards.
 
